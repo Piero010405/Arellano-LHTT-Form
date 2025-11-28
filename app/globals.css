@@ -124,3 +124,12 @@
     @apply bg-background text-foreground;
   }
 }
+
+select option {
+  padding: 8px;
+}
+
+select option:hover {
+  background-color: #f1f5f9 !important; /* gris claro: igual al dropdown */
+  color: #000;
+}

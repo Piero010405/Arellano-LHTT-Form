@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import FormField from "@/components/form-field";
@@ -34,6 +35,8 @@ interface ArellanoFormProps {
 }
 
 export default function ArellanoForm({ onSubmit }: ArellanoFormProps) {
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+
   const [formData, setFormData] = useState<FormData>({
     cluster: "",
     email: "",
@@ -46,7 +49,8 @@ export default function ArellanoForm({ onSubmit }: ArellanoFormProps) {
     precio: "",
   });
 
-  const { results: productResults } = useProductSearch(formData.busqueda);
+  const { results: productResults, loading: loadingProducts } = useProductSearch(formData.busqueda);
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -68,8 +72,8 @@ export default function ArellanoForm({ onSubmit }: ArellanoFormProps) {
 
     if (!formData.email) {
       newErrors.email = "Este campo es obligatorio";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Ingresa un correo válido";
+    } else if (!/^[A-Za-z0-9._%+-]+@arellano\.pe$/.test(formData.email)) {
+      newErrors.email = "El correo debe ser del dominio @arellano.pe";
     }
 
     if (!formData.codigo) newErrors.codigo = "Este campo es obligatorio";
@@ -122,6 +126,20 @@ export default function ArellanoForm({ onSubmit }: ArellanoFormProps) {
     }
   };
 
+  // Cerrar dropdown al hacer click fuera
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
@@ -134,27 +152,27 @@ export default function ArellanoForm({ onSubmit }: ArellanoFormProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-slate-50 py-8 px-4 md:py-12">
+    <div className="min-h-screen bg-linear-to-b from-background to-slate-50 py-8 px-4 md:py-12">
       <div className="max-w-2xl mx-auto">
 
         {/* HEADER */}
         <div className="mb-8 text-center">
           <div className="mb-4 h-16 bg-primary rounded-lg flex items-center justify-center border-2 border-primary">
             <span className="text-white text-lg font-bold tracking-wider">
-              ARELLANO
+              Arellano | Auditoria
             </span>
           </div>
           <h1 className="text-4xl font-bold text-primary mb-2">
             Formulario LHTT
           </h1>
-          <p className="text-muted-foreground">Alternativas de Gestión</p>
+          <p className="text-muted-foreground">Alternativas de Gestión de Contratos</p>
         </div>
 
         {/* CARD */}
         <Card className="shadow-lg border border-border">
-          <CardHeader className="bg-primary text-primary-foreground rounded-t-lg">
-            <CardTitle className="text-2xl">Registro de Alternativas</CardTitle>
-          </CardHeader>
+            <div className="bg-primary text-primary-foreground px-6 py-4 rounded-t-lg">
+              <h2 className="text-2xl font-semibold">Registro de Alternativas</h2>
+            </div>
 
           <CardContent className="pt-8">
             <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off">
@@ -178,13 +196,14 @@ export default function ArellanoForm({ onSubmit }: ArellanoFormProps) {
                       aria-label="Cluster"
                       value={formData.cluster}
                       onChange={handleChange}
-                      className="w-full px-4 py-2 pl-10 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:outline-none"
+                      className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-md bg-white text-gray-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primarytransition-all"
                     >
                       <option value="">Selecciona un cluster</option>
                       <option value="Cluster Norte">Cluster Norte</option>
                       <option value="Cluster Centro">Cluster Centro</option>
                       <option value="Cluster Sur">Cluster Sur</option>
                     </select>
+
                   </FormField>
 
                   {/* CORREO */}
@@ -235,11 +254,21 @@ export default function ArellanoForm({ onSubmit }: ArellanoFormProps) {
                       onChange={handleChange}
                     />
 
-                    {dropdownOpen &&
-                      productResults.length > 0 &&
-                      formData.busqueda.length >= 2 && (
-                        <div className="absolute z-50 w-full bg-white border border-gray-300 rounded-md shadow-md mt-1 max-h-48 overflow-auto">
-                          {productResults.map((item) => (
+                    {dropdownOpen && (
+                      <div
+                        ref={dropdownRef}
+                        className="absolute z-50 w-full bg-white border border-gray-300 rounded-md shadow-md mt-1 max-h-48 overflow-auto"
+                      >
+                        {loadingProducts ? (
+                          <div className="px-3 py-2 text-sm text-gray-500 animate-pulse">
+                            Buscando...
+                          </div>
+                        ) : productResults.length === 0 ? (
+                          <div className="px-3 py-2 text-sm text-gray-500">
+                            No se encontraron resultados
+                          </div>
+                        ) : (
+                          productResults.map((item) => (
                             <div
                               key={item.productId}
                               onClick={() => {
@@ -249,21 +278,20 @@ export default function ArellanoForm({ onSubmit }: ArellanoFormProps) {
                                   nankey: String(item.productId),
                                 }));
 
-                                // Cerrar dropdown correctamente
+                                // Cerrar dropdown de inmediato
                                 setDropdownOpen(false);
 
-                                // Evitar que se reabra automáticamente
-                                setTimeout(() => {
-                                  setDropdownOpen(false);
-                                }, 0);
+                                // Evitar que se reabra
+                                setTimeout(() => setDropdownOpen(false), 0);
                               }}
                               className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
                             >
                               {item.description}
                             </div>
-                          ))}
-                        </div>
-                      )}
+                          ))
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   {/* NANKEY */}
@@ -345,7 +373,7 @@ export default function ArellanoForm({ onSubmit }: ArellanoFormProps) {
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold py-3 rounded-lg transition-all duration-200 transform hover:scale-105"
+                  className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold py-3 rounded-lg transition-all duration-200 transform hover:scale-105 cursor-pointer"
                 >
                   {isSubmitting ? "Enviando..." : "Enviar Formulario"}
                 </Button>

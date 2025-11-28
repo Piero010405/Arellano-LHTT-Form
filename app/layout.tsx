@@ -8,9 +8,9 @@ const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "ARELLANO - Formulario LHTT Alternativas",
+  title: "Arellano | Formulario LHTT Alternativas",
   description: "Formulario de gestión de alternativas LHTT",
-  generator: "v0.app",
+  generator: "Piero Sarmiento",
 }
 
 export default function RootLayout({

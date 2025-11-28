@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRef } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useEffect, useRef } from "react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import FormField from "@/components/form-field";
+import { useSubmitAlternativa } from "@/hooks/useSubmitAlternativa";
+import ArellanoLoader from "@/components/arellano-loader";
+import { useToast } from "@/components/ui/use-toast";
 import {
   MapPin,
   Mail,
@@ -31,11 +33,14 @@ interface FormData {
 }
 
 interface ArellanoFormProps {
-  onSubmit: (data: FormData) => void;
+  onSubmit?: (data: FormData) => void;
+  onSuccess: (registroId: string) => void;
 }
 
-export default function ArellanoForm({ onSubmit }: ArellanoFormProps) {
+export default function ArellanoForm({ onSuccess }: ArellanoFormProps) {
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const { submitAlternativa, loading } = useSubmitAlternativa();
+  const { toast } = useToast();
 
   const [formData, setFormData] = useState<FormData>({
     cluster: "",
@@ -49,38 +54,87 @@ export default function ArellanoForm({ onSubmit }: ArellanoFormProps) {
     precio: "",
   });
 
-  const { results: productResults, loading: loadingProducts } = useProductSearch(formData.busqueda);
+  const { results: productResults, loading: loadingProducts } =
+    useProductSearch(formData.busqueda);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
+  // ------------------------------
+  // 🔍 Scroll al primer campo con error
+  // ------------------------------
+  const scrollToFirstError = (errorMap: Record<string, string>) => {
+    const order = [
+      "cluster",
+      "email",
+      "codigo",
+      "busqueda",
+      "nankey",
+      "inventarioSala",
+      "inventarioDeposito",
+      "inventarioFrio",
+      "precio",
+    ];
+
+    const firstKey = order.find((k) => errorMap[k]);
+    if (!firstKey) return;
+
+    const el = document.querySelector<HTMLElement>(`[name="${firstKey}"]`);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      (el as HTMLInputElement | HTMLSelectElement).focus();
+    }
+  };
+
+  // ------------------------------
+  // AUTOCOMPLETE / NANKEY
+  // ------------------------------
   useEffect(() => {
-    // Si se borra toda la descripción → resetear nankey
     if (formData.busqueda.trim().length === 0) {
       setFormData((prev) => ({ ...prev, nankey: "" }));
     }
 
-    // Abrir/cerrar dropdown según longitud
     setDropdownOpen(formData.busqueda.length >= 2);
   }, [formData.busqueda]);
 
-  const validateForm = () => {
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setDropdownOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // ------------------------------
+  // VALIDACIÓN FRONT
+  // ------------------------------
+  const validateForm = (): Record<string, string> => {
     const newErrors: Record<string, string> = {};
 
     if (!formData.cluster) newErrors.cluster = "Este campo es obligatorio";
 
     if (!formData.email) {
       newErrors.email = "Este campo es obligatorio";
-    } else if (!/^[A-Za-z0-9._%+-]+@arellano\.pe$/.test(formData.email)) {
-      newErrors.email = "El correo debe ser del dominio @arellano.pe";
+    } else if (!formData.email.endsWith("@arellano.pe")) {
+      newErrors.email = "El correo debe terminar en @arellano.pe";
     }
 
     if (!formData.codigo) newErrors.codigo = "Este campo es obligatorio";
-    if (!formData.busqueda) newErrors.busqueda = "Este campo es obligatorio";
+
+    if (!formData.busqueda) {
+      newErrors.busqueda = "Este campo es obligatorio";
+    } else if (!formData.nankey) {
+      newErrors.nankey = "Debes seleccionar un producto de la lista";
+    }
+
     if (!formData.precio) newErrors.precio = "Este campo es obligatorio";
 
-    // Inventarios
     const inv = [
       Number(formData.inventarioSala) || 0,
       Number(formData.inventarioDeposito) || 0,
@@ -96,9 +150,12 @@ export default function ArellanoForm({ onSubmit }: ArellanoFormProps) {
     if (precioNum <= 0) newErrors.precio = "El precio debe ser mayor a cero";
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return newErrors;
   };
 
+  // ------------------------------
+  // HANDLE CHANGE
+  // ------------------------------
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -117,7 +174,6 @@ export default function ArellanoForm({ onSubmit }: ArellanoFormProps) {
     }
 
     if (name === "busqueda") {
-      // Solo abrir si el usuario está escribiendo
       if (value.length >= 2) {
         setDropdownOpen(true);
       } else {
@@ -126,35 +182,74 @@ export default function ArellanoForm({ onSubmit }: ArellanoFormProps) {
     }
   };
 
-  // Cerrar dropdown al hacer click fuera
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setDropdownOpen(false);
-      }
-    }
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  const handleSubmit = (e: React.FormEvent) => {
+  // ------------------------------
+  // HANDLE SUBMIT
+  // ------------------------------
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateForm()) {
-      setIsSubmitting(true);
-      setTimeout(() => {
-        onSubmit(formData);
-        setIsSubmitting(false);
-      }, 500);
+
+    const frontErrors = validateForm();
+    if (Object.keys(frontErrors).length > 0) {
+      scrollToFirstError(frontErrors);
+      return;
     }
+
+    const payload = {
+      cluster: formData.cluster,
+      correoArellano: formData.email,
+      codigoAlternativa: Number(formData.codigo),
+      productDesc: formData.busqueda.trim(),
+      nankey: Number(formData.nankey),
+      inventarioSala: formData.inventarioSala
+        ? Number(formData.inventarioSala)
+        : null,
+      inventarioDeposito: formData.inventarioDeposito
+        ? Number(formData.inventarioDeposito)
+        : null,
+      inventarioFrio: formData.inventarioFrio
+        ? Number(formData.inventarioFrio)
+        : null,
+      precio: Number(formData.precio),
+    };
+
+    const result = await submitAlternativa(payload);
+
+    // ❌ ERROR DESDE EL BACKEND (ZOD / OTROS)
+    if (!result.success) {
+      const fe = result.fieldErrors;
+
+      if (fe && Object.keys(fe).length > 0) {
+        const mapped: Record<string, string> = {};
+
+        if (fe.correoArellano) mapped.email = fe.correoArellano[0];
+        if (fe.codigoAlternativa) mapped.codigo = fe.codigoAlternativa[0];
+        if (fe.productDesc) mapped.busqueda = fe.productDesc[0];
+        if (fe.nankey) mapped.nankey = fe.nankey[0];
+        if (fe.precio) mapped.precio = fe.precio[0];
+
+        setErrors(mapped);
+        scrollToFirstError(mapped);
+        return;
+      }
+
+      toast({
+        title: "Error al enviar",
+        description: result.message,
+        variant: "destructive",
+      });
+
+      return;
+    }
+
+    onSuccess(result.registroId!);
   };
 
+  // ------------------------------
+  // RENDER
+  // ------------------------------
   return (
     <div className="min-h-screen bg-linear-to-b from-background to-slate-50 py-8 px-4 md:py-12">
       <div className="max-w-2xl mx-auto">
-
         {/* HEADER */}
         <div className="mb-8 text-center">
           <div className="mb-4 h-16 bg-primary rounded-lg flex items-center justify-center border-2 border-primary">
@@ -165,25 +260,35 @@ export default function ArellanoForm({ onSubmit }: ArellanoFormProps) {
           <h1 className="text-4xl font-bold text-primary mb-2">
             Formulario LHTT
           </h1>
-          <p className="text-muted-foreground">Alternativas de Gestión de Contratos</p>
+          <p className="text-muted-foreground">
+            Alternativas de Gestión de Contratos
+          </p>
         </div>
 
-        {/* CARD */}
+        {loading && (
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+            <ArellanoLoader />
+          </div>
+        )}
+
         <Card className="shadow-lg border border-border">
-            <div className="bg-primary text-primary-foreground px-6 py-4 rounded-t-lg">
-              <h2 className="text-2xl font-semibold">Registro de Alternativas</h2>
-            </div>
+          <div className="bg-primary text-primary-foreground px-6 py-4 rounded-t-lg">
+            <h2 className="text-2xl font-semibold">Registro de Alternativas</h2>
+          </div>
 
           <CardContent className="pt-8">
-            <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off">
-
+            <form
+              onSubmit={handleSubmit}
+              className="space-y-6"
+              autoComplete="off"
+            >
               {/* INFORMACIÓN GENERAL */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-primary">Información General</h3>
+                <h3 className="text-lg font-semibold text-primary">
+                  Información General
+                </h3>
 
                 <div className="pl-4 border-l-4 border-primary space-y-4">
-
-                  {/* SELECT CLUSTER (ACCESIBLE CORRECTAMENTE) */}
                   <FormField
                     label="CLUSTER"
                     required
@@ -203,16 +308,14 @@ export default function ArellanoForm({ onSubmit }: ArellanoFormProps) {
                       <option value="Cluster Centro">Cluster Centro</option>
                       <option value="Cluster Sur">Cluster Sur</option>
                     </select>
-
                   </FormField>
 
-                  {/* CORREO */}
                   <FormField
                     label="CORREO ARELLANO"
                     name="email"
                     required
                     type="email"
-                    placeholder="correo@arellano.com"
+                    placeholder="correo@arellano.pe"
                     icon={<Mail className="w-5 h-5" />}
                     error={errors.email}
                     value={formData.email}
@@ -223,11 +326,11 @@ export default function ArellanoForm({ onSubmit }: ArellanoFormProps) {
 
               {/* DATOS DEL PRODUCTO */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-primary">Datos del Producto</h3>
+                <h3 className="text-lg font-semibold text-primary">
+                  Datos del Producto
+                </h3>
 
                 <div className="pl-4 border-l-4 border-primary space-y-4">
-
-                  {/* CÓDIGO */}
                   <FormField
                     label="CODIGO DE ALTERNATIVA"
                     name="codigo"
@@ -240,7 +343,6 @@ export default function ArellanoForm({ onSubmit }: ArellanoFormProps) {
                     onChange={handleChange}
                   />
 
-                  {/* BUSQUEDA + AUTOCOMPLETE */}
                   <div className="relative">
                     <FormField
                       label="BUSQUEDA POR (DESCRIPCIÓN DEL PRODUCTO)"
@@ -277,11 +379,7 @@ export default function ArellanoForm({ onSubmit }: ArellanoFormProps) {
                                   busqueda: item.description,
                                   nankey: String(item.productId),
                                 }));
-
-                                // Cerrar dropdown de inmediato
                                 setDropdownOpen(false);
-
-                                // Evitar que se reabra
                                 setTimeout(() => setDropdownOpen(false), 0);
                               }}
                               className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
@@ -294,7 +392,6 @@ export default function ArellanoForm({ onSubmit }: ArellanoFormProps) {
                     )}
                   </div>
 
-                  {/* NANKEY */}
                   <FormField
                     label="NANKEY"
                     name="nankey"
@@ -302,13 +399,16 @@ export default function ArellanoForm({ onSubmit }: ArellanoFormProps) {
                     disabled
                     icon={<Lock className="w-5 h-5" />}
                     value={formData.nankey}
+                    error={errors.nankey}
                   />
                 </div>
               </div>
 
               {/* INVENTARIOS */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-primary">Niveles de Inventario</h3>
+                <h3 className="text-lg font-semibold text-primary">
+                  Niveles de Inventario
+                </h3>
 
                 <div className="pl-4 border-l-4 border-primary space-y-4">
                   {errors.inventoryWarning && (
@@ -372,13 +472,11 @@ export default function ArellanoForm({ onSubmit }: ArellanoFormProps) {
               <div className="pt-8">
                 <Button
                   type="submit"
-                  disabled={isSubmitting}
                   className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold py-3 rounded-lg transition-all duration-200 transform hover:scale-105 cursor-pointer"
                 >
-                  {isSubmitting ? "Enviando..." : "Enviar Formulario"}
+                  Enviar Formulario
                 </Button>
               </div>
-
             </form>
           </CardContent>
         </Card>

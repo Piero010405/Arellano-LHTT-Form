@@ -11,12 +11,19 @@ export async function insertFormResponse(
   request.input("Cluster", sql.NVarChar(50), data.cluster);
   request.input("CorreoArellano", sql.NVarChar(255), data.correoArellano);
   request.input("CodigoAlternativa", sql.Int, data.codigoAlternativa);
-  request.input("ProductDesc", sql.NVarChar(255), data.productDesc);
-  request.input("NanKey", sql.Float, data.nankey);
-  request.input("InventarioSala", sql.Int, data.inventarioSala);
-  request.input("InventarioDeposito", sql.Int, data.inventarioDeposito);
-  request.input("InventarioFrio", sql.Int, data.inventarioFrio);
-  request.input("Precio", sql.Decimal(18, 2), data.precio);
+
+  // Nullable strings
+  request.input("ProductDesc", sql.NVarChar(255), data.productDesc ?? null);
+
+  // Nullable numbers — esto sí es válido
+  request.input("NanKey", sql.Float, data.nankey ?? null);
+  request.input("InventarioSala", sql.Int, data.inventarioSala ?? null);
+  request.input("InventarioDeposito", sql.Int, data.inventarioDeposito ?? null);
+  request.input("InventarioFrio", sql.Int, data.inventarioFrio ?? null);
+
+  // CORRECCIÓN ABSOLUTA → NO usar Decimal(18,2)
+  request.input("Precio", sql.Decimal, data.precio);
+
 
   const result = await request.query<{
     Id: number;

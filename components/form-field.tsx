@@ -1,6 +1,6 @@
 "use client";
 
-import type React from "react";
+import React, { forwardRef } from "react";
 
 interface FormFieldProps {
   label: string;
@@ -19,60 +19,69 @@ interface FormFieldProps {
   children?: React.ReactNode;
 }
 
-export default function FormField({
-  label,
-  required = false,
-  type = "text",
-  name, // ❗ YA NO generamos name automáticamente (causaba bugs)
-  placeholder = "",
-  icon,
-  error,
-  value,
-  onChange,
-  disabled = false,
-  step,
-  children,
-}: FormFieldProps) {
-  return (
-    <div className="space-y-2">
-      {/* LABEL */}
-      <label className="block text-sm font-medium text-foreground">
-        {label}
-        {required && <span className="text-red-500 ml-1">*</span>}
-      </label>
+const FormField = forwardRef<HTMLInputElement, FormFieldProps>(
+  (
+    {
+      label,
+      required = false,
+      type = "text",
+      name,
+      placeholder = "",
+      icon,
+      error,
+      value,
+      onChange,
+      disabled = false,
+      step,
+      children,
+    },
+    ref
+  ) => {
+    return (
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-foreground">
+          {label}
+          {required && <span className="text-red-500 ml-1">*</span>}
+        </label>
 
-      <div className="relative">
-        {/* ICON */}
-        {icon && (
-          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary pointer-events-none">
-            {icon}
-          </div>
-        )}
+        <div className="relative">
+          {icon && (
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-primary pointer-events-none">
+              {icon}
+            </div>
+          )}
 
-        {/* SI VIENE CHILDREN → ES UN SELECT */}
-        {children ? (
-          children
-        ) : (
-          <input
-            type={type}
-            name={name}        // ✔ ahora usa el name correcto que le pasas
-            placeholder={placeholder}
-            value={value ?? ""} // ✔ evita value undefined que rompe inputs
-            onChange={onChange}
-            disabled={disabled}
-            step={step}
-            autoComplete="off"  // ✔ evita autocompletar raro
-            className={`w-full px-4 py-2 ${icon ? "pl-10" : ""} border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all ${
-              disabled
-                ? "bg-muted text-muted-foreground cursor-not-allowed"
-                : "bg-background text-foreground"
-            } ${error ? "border-red-500" : "border-border"}`}
-          />
-        )}
+          {children ? (
+            children
+          ) : (
+            <input
+              ref={ref}
+              type={type}
+              name={name}
+              placeholder={placeholder}
+              value={value ?? ""}
+              onChange={onChange}
+              disabled={disabled}
+              step={step}
+              autoComplete="off"
+              onWheel={(e) => e.currentTarget.blur()}
+              className={`w-full px-4 py-2 ${
+                icon ? "pl-10" : ""
+              } border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all ${
+                disabled
+                  ? "bg-muted text-muted-foreground cursor-not-allowed"
+                  : "bg-background text-foreground"
+              } ${error ? "border-red-500" : "border-border"}`}
+            />
+          )}
+        </div>
+
+        {error && <p className="text-sm text-red-500">{error}</p>}
       </div>
+    );
+  }
+);
 
-      {/* ERROR MESSAGE */}
-      {error && <p className="text-sm text-red-500">{error}</p>}
-    </div>
-  );
-}
+FormField.displayName = "FormField";
+
+export default FormField;

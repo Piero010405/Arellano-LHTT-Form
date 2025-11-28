@@ -14,8 +14,8 @@ const formResponseSchema = z.object({
   cluster: z.enum(clusterEnum),
   correoArellano: z.string().email(),
   codigoAlternativa: z.number().int().min(1),
-  productDesc: z.string().min(1).max(255).nullable().optional(),
-  nankey: z.number().nullable().optional(),
+  productDesc: z.string().min(1).max(255),
+  nankey: z.number().positive(),
   inventarioSala: z.number().int().min(0).nullable().optional(),
   inventarioDeposito: z.number().int().min(0).nullable().optional(),
   inventarioFrio: z.number().int().min(0).nullable().optional(),
@@ -28,14 +28,19 @@ export async function POST(req: NextRequest) {
 
     const parsed = formResponseSchema.safeParse(json);
     if (!parsed.success) {
+      const flat = parsed.error.flatten();
+
       return NextResponse.json(
         {
           error: "Body inválido",
-          details: parsed.error.flatten(),
+          fieldErrors: flat.fieldErrors,
+          formErrors: flat.formErrors,
+          received: json,
         },
         { status: 400 }
       );
     }
+
 
     const data = parsed.data;
 
@@ -51,7 +56,17 @@ export async function POST(req: NextRequest) {
       precio: data.precio,
     });
 
-    return NextResponse.json({ ok: true, response: created }, { status: 201 });
+    // Generamos ID simple (puede mejorarse si quieres)
+    const registroId = `${data.codigoAlternativa}-${data.nankey ?? "0"}`;
+
+    return NextResponse.json(
+      {
+        success: true,
+        registroId,
+        response: created,
+      },
+      { status: 201 }
+    );
   } catch (error) {
     console.error("Error POST /api/responses:", error);
     return NextResponse.json(

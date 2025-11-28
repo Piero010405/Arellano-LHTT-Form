@@ -6,13 +6,14 @@ export async function searchProductsService(
   search: string,
   limit = 10
 ): Promise<Product[]> {
-  const trimmed = search.trim();
+  const trimmed = search.trim().toLowerCase();
 
   if (trimmed.length < 2) {
-    // No tiene sentido buscar con 1 carácter, devolvemos vacío
+    // mínimo 2 caracteres para evitar spam
     return [];
   }
 
   const safeLimit = Math.min(Math.max(limit, 1), 25); // 1–25
+
   return findProductsByDescription(trimmed, safeLimit);
 }

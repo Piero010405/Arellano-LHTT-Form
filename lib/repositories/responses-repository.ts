@@ -1,5 +1,6 @@
 // lib/repositories/responses-repository.ts
-import { getSqlServerPool, sql } from "@/lib/db/sqlserver";
+import { getSqlServerPool } from "@/lib/db/sqlserver";
+import sql from "mssql";
 import type { FormResponseInput, FormResponse } from "@/lib/domain/response";
 
 export async function insertFormResponse(
@@ -22,8 +23,7 @@ export async function insertFormResponse(
   request.input("InventarioFrio", sql.Int, data.inventarioFrio ?? null);
 
   // CORRECCIÓN ABSOLUTA → NO usar Decimal(18,2)
-  request.input("Precio", sql.Decimal, data.precio);
-
+  request.input("Precio", sql.Decimal(18, 2), data.precio);
 
   const result = await request.query<{
     Id: number;

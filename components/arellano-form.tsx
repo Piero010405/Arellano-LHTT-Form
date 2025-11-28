@@ -209,7 +209,7 @@ export default function ArellanoForm({ onSuccess }: ArellanoFormProps) {
       inventarioFrio: formData.inventarioFrio
         ? Number(formData.inventarioFrio)
         : null,
-      precio: Number(formData.precio),
+      precio: parseFloat(formData.precio)
     };
 
     const result = await submitAlternativa(payload);

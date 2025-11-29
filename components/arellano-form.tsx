@@ -8,6 +8,7 @@ import FormField from "@/components/form-field";
 import ArellanoLoader from "@/components/arellano-loader";
 import { useToast } from "@/components/ui/use-toast";
 import { useCart } from "@/contexts/cart-context";
+import { useGeneralForm } from "@/contexts/general-form-context";
 
 import {
   MapPin,
@@ -21,15 +22,7 @@ import CartList from "@/components/cart-list";
 import { useProductSearch } from "@/hooks/useProductSearch";
 import { useSubmitAlternativa } from "@/hooks/useSubmitAlternativa";
 
-// ---------------------------
-// Types
-// ---------------------------
-interface FormData {
-  cluster: string;
-  email: string;
-  codigo: string;
-
-  // dinámicos para item
+interface ItemFormData {
   busqueda: string;
   nankey: string;
   inventarioSala: string;
@@ -42,22 +35,17 @@ interface ArellanoFormProps {
   onSuccess: (registroId: string) => void;
 }
 
-// ---------------------------
-// Component
-// ---------------------------
 export default function ArellanoForm({ onSuccess }: ArellanoFormProps) {
   const { toast } = useToast();
   const { items, clear } = useCart();
+  const { general, setGeneral, clearGeneral } = useGeneralForm();
 
-  // ref PERMITE NULL
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   const { submitAlternativa, loading } = useSubmitAlternativa();
 
-  const [formData, setFormData] = useState<FormData>({
-    cluster: "",
-    email: "",
-    codigo: "",
+  // Estado solo de los campos dinámicos del item
+  const [formData, setFormData] = useState<ItemFormData>({
     busqueda: "",
     nankey: "",
     inventarioSala: "",
@@ -69,87 +57,83 @@ export default function ArellanoForm({ onSuccess }: ArellanoFormProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  // AUTOCOMPLETE API
   const { results: productResults, loading: loadingProducts } =
     useProductSearch(formData.busqueda);
 
-  // ---------------------------
-  // Scroll to first error
-  // ---------------------------
-  const scrollToFirstError = (errObj: Record<string, string>) => {
+  // -----------------------------------------
+  // SCROLL TO FIRST ERROR
+  // -----------------------------------------
+  const scrollToFirstError = (errorMap: Record<string, string>) => {
     const order = ["cluster", "email", "codigo"];
-    const firstErrorKey = order.find((k) => errObj[k]);
+    const firstKey = order.find((k) => errorMap[k]);
 
-    if (!firstErrorKey) return;
+    if (!firstKey) return;
 
-    const el = document.querySelector<HTMLElement>(`[name="${firstErrorKey}"]`);
+    const el = document.querySelector<HTMLElement>(`[name="${firstKey}"]`);
     if (el) {
       el.scrollIntoView({ behavior: "smooth", block: "center" });
       el.focus();
     }
   };
 
-  // ---------------------------
-  // AUTOCOMPLETE / NANKEY
-  // ---------------------------
+  // -----------------------------------------
+  // AUTOCOMPLETE LOGIC
+  // -----------------------------------------
   useEffect(() => {
-    if (formData.busqueda.trim().length === 0) {
+    if (formData.busqueda.trim() === "") {
       setFormData((prev) => ({ ...prev, nankey: "" }));
     }
-
     setDropdownOpen(formData.busqueda.length >= 2);
   }, [formData.busqueda]);
 
   useEffect(() => {
-    const handler = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
+    const handler = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setDropdownOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  // ---------------------------
-  // HANDLE CHANGE
-  // ---------------------------
+  // -----------------------------------------
+  // HANDLE CHANGE (context + local)
+  // -----------------------------------------
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
 
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    // Campos globales → cluster / email / codigo
+    if (["cluster", "email", "codigo"].includes(name)) {
+      setGeneral((prev) => ({ ...prev, [name]: value }));
+    } else {
+      // Campos de producto
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
 
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
 
     if (name === "busqueda") {
-      if (value.length >= 2) setDropdownOpen(true);
-      else setDropdownOpen(false);
+      setDropdownOpen(value.length >= 2);
     }
   };
 
-  // ---------------------------
-  // VALIDACIÓN GENERAL
-  // ---------------------------
+  // -----------------------------------------
+  // VALIDACIÓN GENERAL (solo campos globales + carrito)
+  // -----------------------------------------
   const validateGeneral = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.cluster) newErrors.cluster = "Campo obligatorio";
-    if (!formData.codigo) newErrors.codigo = "Campo obligatorio";
+    if (!general.cluster) newErrors.cluster = "Campo obligatorio";
 
-    if (!formData.email)
-      newErrors.email = "Campo obligatorio";
-    else if (!formData.email.endsWith("@arellano.pe"))
+    if (!general.email) newErrors.email = "Campo obligatorio";
+    else if (!general.email.endsWith("@arellano.pe"))
       newErrors.email = "Debe terminar en @arellano.pe";
+
+    if (!general.codigo) newErrors.codigo = "Campo obligatorio";
 
     if (items.length === 0)
       newErrors.items = "Debe agregar al menos 1 producto";
@@ -158,16 +142,15 @@ export default function ArellanoForm({ onSuccess }: ArellanoFormProps) {
     return newErrors;
   };
 
-  // ---------------------------
-  // SUBMIT → ENVÍA TODOS LOS ITEMS
-  // ---------------------------
+  // -----------------------------------------
+  // SUBMIT → ENVÍA TODO EL CARRITO
+  // -----------------------------------------
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const frontErrors = validateGeneral();
-
     if (Object.keys(frontErrors).length > 0) {
-      scrollToFirstError(frontErrors); // 👉 SCROLL ACTIVADO
+      scrollToFirstError(frontErrors);
       toast({
         title: "Formulario incompleto",
         description: "Revisa los campos marcados en rojo",
@@ -176,12 +159,12 @@ export default function ArellanoForm({ onSuccess }: ArellanoFormProps) {
       return;
     }
 
-    // Enviar uno por uno
+    // Enviar cada item
     for (const item of items) {
       const payload = {
-        cluster: formData.cluster,
-        correoArellano: formData.email,
-        codigoAlternativa: Number(formData.codigo),
+        cluster: general.cluster,
+        correoArellano: general.email,
+        codigoAlternativa: Number(general.codigo),
         productDesc: item.description,
         nankey: item.nankey,
         inventarioSala: item.inventarioSala,
@@ -202,18 +185,29 @@ export default function ArellanoForm({ onSuccess }: ArellanoFormProps) {
       }
     }
 
+    // Reset total
     clear();
-    onSuccess(`${formData.codigo}-${Date.now()}`);
+    clearGeneral();
+    setFormData({
+      busqueda: "",
+      nankey: "",
+      inventarioSala: "",
+      inventarioDeposito: "",
+      inventarioFrio: "",
+      precio: "",
+    });
+
+    onSuccess(`${general.codigo}-${Date.now()}`);
   };
 
-  // ---------------------------
+  // -----------------------------------------
   // RENDER
-  // ---------------------------
+  // -----------------------------------------
   return (
     <div className="min-h-screen bg-linear-to-b from-background to-slate-50 py-8 px-4 md:py-12">
       <div className="max-w-2xl mx-auto">
 
-        {/* ---- HEADER ---- */}
+        {/* HEADER */}
         <div className="mb-8 text-center">
           <div className="mb-4 h-16 bg-primary rounded-lg flex items-center justify-center border-2 border-primary">
             <span className="text-white text-lg font-bold tracking-wider">
@@ -226,14 +220,12 @@ export default function ArellanoForm({ onSuccess }: ArellanoFormProps) {
           </p>
         </div>
 
-        {/* LOADER */}
         {loading && (
           <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
             <ArellanoLoader />
           </div>
         )}
 
-        {/* CARD */}
         <Card className="shadow-lg border border-border">
           <div className="bg-primary text-primary-foreground px-6 py-4 rounded-t-lg">
             <h2 className="text-2xl font-semibold">Registro de Alternativas</h2>
@@ -241,17 +233,14 @@ export default function ArellanoForm({ onSuccess }: ArellanoFormProps) {
 
           <CardContent className="pt-8">
             <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off">
-
-              {/* ------------------------- */}
-              {/* INFORMACIÓN GENERAL */}
-              {/* ------------------------- */}
+              
+              {/* INFORMACION GENERAL */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-primary">Información General</h3>
 
                 <div className="pl-4 border-l-4 border-primary space-y-4">
 
-                  {/* CLUSTER */}
-                   <FormField
+                  <FormField
                     label="CLUSTER"
                     required
                     icon={<MapPin className="w-5 h-5" />}
@@ -259,11 +248,10 @@ export default function ArellanoForm({ onSuccess }: ArellanoFormProps) {
                   >
                     <select
                       name="cluster"
-                      id="cluster"
                       aria-label="Cluster"
-                      value={formData.cluster}
+                      value={general.cluster}
                       onChange={handleChange}
-                      className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-md bg-white text-gray-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primarytransition-all"
+                      className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-md bg-white"
                     >
                       <option value="">Selecciona un cluster</option>
                       <option value="Cluster Norte">Cluster Norte</option>
@@ -272,7 +260,6 @@ export default function ArellanoForm({ onSuccess }: ArellanoFormProps) {
                     </select>
                   </FormField>
 
-                  {/* EMAIL */}
                   <FormField
                     label="CORREO ARELLANO"
                     name="email"
@@ -281,11 +268,10 @@ export default function ArellanoForm({ onSuccess }: ArellanoFormProps) {
                     placeholder="correo@arellano.pe"
                     icon={<Mail className="w-5 h-5" />}
                     error={errors.email}
-                    value={formData.email}
+                    value={general.email}
                     onChange={handleChange}
                   />
 
-                  {/* CÓDIGO */}
                   <FormField
                     label="CÓDIGO DE ALTERNATIVA"
                     name="codigo"
@@ -294,10 +280,9 @@ export default function ArellanoForm({ onSuccess }: ArellanoFormProps) {
                     placeholder="Ej: 12345"
                     icon={<Hash className="w-5 h-5" />}
                     error={errors.codigo}
-                    value={formData.codigo}
+                    value={general.codigo}
                     onChange={handleChange}
                   />
-
                 </div>
               </div>
 
@@ -325,7 +310,7 @@ export default function ArellanoForm({ onSuccess }: ArellanoFormProps) {
                 <CartList />
               </div>
 
-              {/* BOTON FINAL */}
+              {/* BOTÓN FINAL */}
               <div className="pt-6">
                 <Button
                   type="submit"

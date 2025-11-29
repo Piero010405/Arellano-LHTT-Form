@@ -102,7 +102,7 @@ export default function CartEditModal({ index, onClose }: Props) {
         </p>
 
         {/* FORM FIELDS */}
-        <div className="space-y-4">
+        <div className="space-y-4 mb-2">
 
           {/* INVENTARIO SALA */}
           <div>
@@ -206,29 +206,29 @@ export default function CartEditModal({ index, onClose }: Props) {
         </div>
 
         {/* ACTION BUTTONS */}
-        <div className="mt-6 flex justify-end gap-2">
-          <button
-            className="px-3 py-2 text-sm bg-gray-200 rounded cursor-pointer"
-            onClick={onClose}
-          >
-            Cancelar
-          </button>
-
-          <button
-            className="px-3 py-2 text-sm bg-primary text-white rounded cursor-pointer"
-            onClick={handleEdit}
-          >
-            Guardar cambios
-          </button>
-        </div>
-
-        {/* CLOSE BUTTON */}
         <button
-          className="absolute right-3 top-3 text-gray-600 cursor-pointer"
-          onClick={onClose}
-          aria-label="Cerrar modal"
+        type="button"
+        className="px-3 py-2 text-sm bg-gray-200 rounded cursor-pointer mr-3"
+        onClick={onClose}
         >
-          <X className="w-5 h-5" />
+        Cancelar
+        </button>
+
+        <button
+        type="button"
+        className="px-3 py-2 text-sm bg-primary text-white rounded cursor-pointer"
+        onClick={handleEdit}
+        >
+        Guardar cambios
+        </button>
+
+        <button
+        type="button"
+        className="absolute right-3 top-3 text-gray-600 cursor-pointer"
+        onClick={onClose}
+        aria-label="Cerrar modal"
+        >
+        <X className="w-5 h-5" />
         </button>
 
       </div>

@@ -36,11 +36,12 @@ export default function ConfirmDeleteModal({ index, onClose }: Props) {
         </p>
 
         <div className="flex justify-end gap-3">
-          <button className="px-3 py-2 bg-gray-200 rounded cursor-pointer" onClick={onClose}>
+          <button className="px-3 py-2 bg-gray-200 rounded cursor-pointer" type="button" onClick={onClose}>
             Cancelar
           </button>
 
           <button
+            type="button"
             className="px-3 py-2 bg-red-600 text-white rounded cursor-pointer"
             onClick={handleDelete}
           >
@@ -49,6 +50,7 @@ export default function ConfirmDeleteModal({ index, onClose }: Props) {
         </div>
 
         <button
+          type="button"
           onClick={onClose}
           className="absolute right-3 top-3 text-gray-600 cursor-pointer"
           aria-label="Cerrar modal"

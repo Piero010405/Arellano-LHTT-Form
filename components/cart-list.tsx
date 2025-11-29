@@ -56,6 +56,7 @@ export default function CartList() {
           {/* Acciones */}
           <div className="flex justify-center gap-3">
             <button
+              type="button"
               className="text-blue-600 hover:text-blue-800 cursor-pointer"
               onClick={() => setEditIndex(index)}
               aria-label="Editar elemento"
@@ -64,6 +65,7 @@ export default function CartList() {
             </button>
 
             <button
+              type="button"
               className="text-red-600 hover:text-red-800 cursor-pointer"
               onClick={() => setDeleteIndex(index)}
               aria-label="Eliminar elemento"

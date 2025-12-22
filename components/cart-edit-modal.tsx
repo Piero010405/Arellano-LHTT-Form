@@ -32,37 +32,29 @@ export default function CartEditModal({ index, onClose }: Props) {
   const validate = () => {
     const newErrors: Record<string, string> = {};
 
-    // Campos vacíos
-    if (form.inventarioSala.trim() === "")
-      newErrors.inventarioSala = "Campo obligatorio";
-
-    if (form.inventarioDeposito.trim() === "")
-      newErrors.inventarioDeposito = "Campo obligatorio";
-
-    if (form.inventarioFrio.trim() === "")
-      newErrors.inventarioFrio = "Campo obligatorio";
-
-    // Validar precio
+    // Precio
     const precio = Number(form.precio);
-    if (form.precio.trim() === "") newErrors.precio = "Campo obligatorio";
+    if (form.precio.trim() === "")
+      newErrors.precio = "Campo obligatorio";
     else if (isNaN(precio) || precio <= 0)
       newErrors.precio = "El precio debe ser mayor a 0";
 
-    // Validación de "al menos un inventario"
-    const sala = Number(form.inventarioSala) || 0;
-    const dep = Number(form.inventarioDeposito) || 0;
-    const frio = Number(form.inventarioFrio) || 0;
+    // Inventarios (vacíos = 0)
+    const sala = Number(form.inventarioSala || 0);
+    const dep = Number(form.inventarioDeposito || 0);
+    const frio = Number(form.inventarioFrio || 0);
 
     if (sala === 0 && dep === 0 && frio === 0) {
+      newErrors.inventarioSala = " ";
+      newErrors.inventarioDeposito = " ";
       newErrors.inventarioFrio =
         "Debe haber al menos un inventario mayor a cero";
-      newErrors.inventarioDeposito = " ";
-      newErrors.inventarioSala = " ";
     }
 
     setErrors(newErrors);
     return newErrors;
   };
+
 
   const handleEdit = () => {
     const validationErrors = validate();

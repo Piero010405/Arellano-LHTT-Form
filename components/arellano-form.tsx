@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import FormField from "@/components/form-field";
 import ArellanoLoader from "@/components/arellano-loader";
+import ConfirmSubmitModal from "@/components/confirm-submit-modal";
 import { useToast } from "@/components/ui/use-toast";
 import { useCart } from "@/contexts/cart-context";
 import { useGeneralForm } from "@/contexts/general-form-context";
@@ -39,6 +40,7 @@ export default function ArellanoForm({ onSuccess }: ArellanoFormProps) {
   const { toast } = useToast();
   const { items, clear } = useCart();
   const { general, setGeneral, clearGeneral } = useGeneralForm();
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
@@ -145,21 +147,7 @@ export default function ArellanoForm({ onSuccess }: ArellanoFormProps) {
   // -----------------------------------------
   // SUBMIT → ENVÍA TODO EL CARRITO
   // -----------------------------------------
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const frontErrors = validateGeneral();
-    if (Object.keys(frontErrors).length > 0) {
-      scrollToFirstError(frontErrors);
-      toast({
-        title: "Formulario incompleto",
-        description: "Revisa los campos marcados en rojo",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Enviar cada item
+  const submitAllItems = async () => {
     for (const item of items) {
       const payload = {
         cluster: general.cluster,
@@ -197,6 +185,7 @@ export default function ArellanoForm({ onSuccess }: ArellanoFormProps) {
       precio: "",
     });
 
+    setShowConfirmModal(false);
     onSuccess(`${general.codigo}-${Date.now()}`);
   };
 
@@ -232,7 +221,7 @@ export default function ArellanoForm({ onSuccess }: ArellanoFormProps) {
           </div>
 
           <CardContent className="pt-8">
-            <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off">
+            <form className="space-y-6" autoComplete="off">
               
               {/* INFORMACION GENERAL */}
               <div className="space-y-4">
@@ -313,7 +302,20 @@ export default function ArellanoForm({ onSuccess }: ArellanoFormProps) {
               {/* BOTÓN FINAL */}
               <div className="pt-6">
                 <Button
-                  type="submit"
+                  type="button"
+                  onClick={() => {
+                    const frontErrors = validateGeneral();
+                    if (Object.keys(frontErrors).length > 0) {
+                      scrollToFirstError(frontErrors);
+                      toast({
+                        title: "Formulario incompleto",
+                        description: "Revisa los campos marcados en rojo",
+                        variant: "destructive",
+                      });
+                      return;
+                    }
+                    setShowConfirmModal(true);
+                  }}
                   className="w-full bg-secondary text-secondary-foreground font-semibold py-3 rounded-lg cursor-pointer"
                 >
                   Enviar todos los productos
@@ -324,6 +326,13 @@ export default function ArellanoForm({ onSuccess }: ArellanoFormProps) {
           </CardContent>
         </Card>
       </div>
+      {showConfirmModal && (
+        <ConfirmSubmitModal
+          onCancel={() => setShowConfirmModal(false)}
+          onConfirm={submitAllItems}
+          loading={loading}
+        />
+      )}
     </div>
   );
 }

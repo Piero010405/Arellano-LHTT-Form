@@ -1,0 +1,362 @@
+[
+  {
+    "codigo": 1008,
+    "codigo_cdar": 439333,
+    "nombre": "CASTILLO CABRERA ZARELA MARILYN",
+    "email": "zcastillo@arellano.pe"
+  },
+  {
+    "codigo": 2021,
+    "codigo_cdar": 498020,
+    "nombre": "CHERO CURO KATHERINE ISABEL",
+    "email": "kchero@arellano.pe"
+  },
+  {
+    "codigo": 8005,
+    "codigo_cdar": 438993,
+    "nombre": "GARCIA LLERENA CARLOS ENRIQUE",
+    "email": "cgarcia@arellano.pe"
+  },
+  {
+    "codigo": 10088,
+    "codigo_cdar": 734401,
+    "nombre": "PAIMA CACHHUAY CESAR ANIBAL",
+    "email": "cpaima@arellano.pe"
+  },
+  {
+    "codigo": 5140,
+    "codigo_cdar": 527243,
+    "nombre": "PUELLES SANTOYO MARLON ROBERTO",
+    "email": "mpuelles@arellano.pe"
+  },
+  {
+    "codigo": 2005,
+    "codigo_cdar": 438960,
+    "nombre": "ROMAN CORDOVA FIORELA BEATRIZ",
+    "email": "froman@arellano.pe"
+  },
+  {
+    "codigo": 6014,
+    "codigo_cdar": 439018,
+    "nombre": "CAYCHO LOAYZA MARIA ALEJANDRA",
+    "email": "caycho@arellano.pe"
+  },
+  {
+    "codigo": 6016,
+    "codigo_cdar": 439016,
+    "nombre": "LOAYZA QUISPITUPAC MARIA ELENA",
+    "email": "mloayza@arellano.pe"
+  },
+  {
+    "codigo": 6034,
+    "codigo_cdar": 461210,
+    "nombre": "AULLA GUTIERREZ MIGUEL ANGEL",
+    "email": "maulla@arellano.pe"
+  },
+  {
+    "codigo": 6050,
+    "codigo_cdar": 438991,
+    "nombre": "MARTINEZ HUERTAS NANCY ELIZABETH",
+    "email": "nmartinez@arellano.pe"
+  },
+  {
+    "codigo": 6992,
+    "codigo_cdar": 439017,
+    "nombre": "NEYRA GOMEZ LUIS ANDRES",
+    "email": "lneyra@arellano.pe"
+  },
+  {
+    "codigo": 10011,
+    "codigo_cdar": 534163,
+    "nombre": "URIARTE YRRAZABAL JOSE LUIS",
+    "email": "juriarte@arellano.pe"
+  },
+  {
+    "codigo": 10033,
+    "codigo_cdar": 596491,
+    "nombre": "PASTRANA RIVERA ANA CRISTINA",
+    "email": "apastrana@arellano.pe"
+  },
+  {
+    "codigo": 10049,
+    "codigo_cdar": 665861,
+    "nombre": "MEDINA RIOS ELVA JOHANA",
+    "email": "emedina@arellano.pe"
+  },
+  {
+    "codigo": 10055,
+    "codigo_cdar": 666361,
+    "nombre": "YAUYO VALDERRAMA PAOLA",
+    "email": "pyauyo@arellano.pe"
+  },
+  {
+    "codigo": 10056,
+    "codigo_cdar": 666381,
+    "nombre": "FLORES SALAZAR EDER DAVID",
+    "email": "eflores@arellano.pe"
+  },
+  {
+    "codigo": 10101,
+    "codigo_cdar": 737761,
+    "nombre": "YUDI YAJAIRA ATENCIA NEVADO",
+    "email": "yatencia@arellano.pe"
+  },
+  {
+    "codigo": 10105,
+    "codigo_cdar": 741901,
+    "nombre": "CAROLAY ROJAS TORRES",
+    "email": "crojas@arellano.pe"
+  },
+  {
+    "codigo": 10129,
+    "codigo_cdar": 785521,
+    "nombre": "PAMELA POLET ZAVALETA PALACIOS",
+    "email": "pzavaleta@arellano.pe"
+  },
+  {
+    "codigo": 10102,
+    "codigo_cdar": 737741,
+    "nombre": "RUTH TATIANA JUAREZ UCAÑAY",
+    "email": "rjuarez@arellano.pe"
+  },
+  {
+    "codigo": 10001,
+    "codigo_cdar": 534120,
+    "nombre": "Aixa Angeles Jurado",
+    "email": "aangeles@arellano.pe"
+  },
+  {
+    "codigo": 4006,
+    "codigo_cdar": 439404,
+    "nombre": "HUAMAN ARANDA JULIA ESTHER",
+    "email": "jhuaman@arellano.pe"
+  },
+  {
+    "codigo": 4011,
+    "codigo_cdar": 439405,
+    "nombre": "YNQUILLA QUISPE CARLOTA",
+    "email": "cynquilla@arellano.pe"
+  },
+  {
+    "codigo": 4014,
+    "codigo_cdar": 439330,
+    "nombre": "BERDEJO MENDIGURI LIDIA",
+    "email": "lberdejo@arellano.pe"
+  },
+  {
+    "codigo": 5004,
+    "codigo_cdar": 438984,
+    "nombre": "TRIVEÑO GUTIERREZ DELIA ELIZABETH",
+    "email": "dtriveno@arellano.pe"
+  },
+  {
+    "codigo": 5016,
+    "codigo_cdar": 438981,
+    "nombre": "CCAMA HUAMAN HUGO",
+    "email": "hccama@arellano.pe"
+  },
+  {
+    "codigo": 5021,
+    "codigo_cdar": 438982,
+    "nombre": "ANCCO HUAMAN YOVANA",
+    "email": "yancco@arellano.pe"
+  },
+  {
+    "codigo": 10110,
+    "codigo_cdar": 741661,
+    "nombre": "ESTHEFANI MULLO LIMACHI",
+    "email": "emullo@arellano.pe"
+  },
+  {
+    "codigo": 10137,
+    "codigo_cdar": 814101,
+    "nombre": "PEREZ AYALA ESTHER MERCEDES",
+    "email": "eperez@arellano.pe"
+  },
+  {
+    "codigo": 10148,
+    "codigo_cdar": 823501,
+    "nombre": "FREDDY TICONA QUISPE",
+    "email": "fticona@arellano.pe"
+  },
+  {
+    "codigo": 10079,
+    "codigo_cdar": 718481,
+    "nombre": "VALVERDE COLCA EDSON JORGE",
+    "email": "evalverde@arellano.pe"
+  },
+  {
+    "codigo": 10082,
+    "codigo_cdar": 726341,
+    "nombre": "ALBUJAR FERNANDEZ JORGE",
+    "email": "jalbujar@arellano.pe"
+  },
+  {
+    "codigo": 6045,
+    "codigo_cdar": 438990,
+    "nombre": "MENDOZA GONZALES JAZMIN IRINA",
+    "email": "jmendoza@arellano.pe"
+  },
+  {
+    "codigo": 6046,
+    "codigo_cdar": 439022,
+    "nombre": "ORIUNDO PACHECO SOCORRO FELICIDAD",
+    "email": "soriundo@arellano.pe"
+  },
+  {
+    "codigo": 10117,
+    "codigo_cdar": 747641,
+    "nombre": "RAMIREZ PISCO ROSVITA",
+    "email": "rramirez@arellano.pe"
+  },
+  {
+    "codigo": 6023,
+    "codigo_cdar": 438989,
+    "nombre": "HUAUYA MUÑOZ CRISTEL GERALDINE",
+    "email": "chuauya@arellano.pe"
+  },
+  {
+    "codigo": 6026,
+    "codigo_cdar": 438985,
+    "nombre": "HILARIO CRISPIN NATIVIDAD MARIA",
+    "email": "nhilario@arellano.pe"
+  },
+  {
+    "codigo": 6030,
+    "codigo_cdar": 439021,
+    "nombre": "HUARCAYA SAIRITUPAC MIGUEL ANGEL",
+    "email": "mhuarcaya@arellano.pe"
+  },
+  {
+    "codigo": 10054,
+    "codigo_cdar": 666341,
+    "nombre": "HILARIO CRISPIN JUANA NILDA",
+    "email": "jhilario@arellano.pe"
+  },
+  {
+    "codigo": 10069,
+    "codigo_cdar": 671581,
+    "nombre": "IGNACIO RODRIGUEZ CESAR LEONIDAD",
+    "email": "cignacio@arellano.pe"
+  },
+  {
+    "codigo": 10106,
+    "codigo_cdar": 741581,
+    "nombre": "KATHERIN DOLLIS SALINAS HUAMAN",
+    "email": "ksalinas@arellano.pe"
+  },
+  {
+    "codigo": 6005,
+    "codigo_cdar": 439012,
+    "nombre": "CHAVEZ SALAZAR FERNANDO MARTIN",
+    "email": "fchavez@arellano.pe"
+  },
+  {
+    "codigo": 10128,
+    "codigo_cdar": 785501,
+    "nombre": "SUSANA JULISSA SANCHEZ AGUIRRE",
+    "email": "ssanchez@arellano.pe"
+  },
+  {
+    "codigo": 7006,
+    "codigo_cdar": 439325,
+    "nombre": "JURADO CHAMORRO SHIRLY ELEANA",
+    "email": "sjurado@arellano.pe"
+  },
+  {
+    "codigo": 1217,
+    "codigo_cdar": 439328,
+    "nombre": "SOTELO SARAVIA ERIKA PAOLA",
+    "email": "esotelo@arellano.pe"
+  },
+  {
+    "codigo": 7016,
+    "codigo_cdar": 439403,
+    "nombre": "ALCALA CORDERO MERY JENNIFER",
+    "email": "malcala@arellano.pe"
+  },
+  {
+    "codigo": 7018,
+    "codigo_cdar": 461245,
+    "nombre": "QUISPEALAYA VIVAS GREISY JANETH",
+    "email": "gquispealaya@arellano.pe"
+  },
+  {
+    "codigo": 1206,
+    "codigo_cdar": 438987,
+    "nombre": "QUISPE RODRIGUEZ CRISTHIAN GABRIEL",
+    "email": "cquispe@arellano.pe"
+  },
+  {
+    "codigo": 1414,
+    "codigo_cdar": 439015,
+    "nombre": "MAMANI LUQUE ROSAS CLEOFE",
+    "email": "rmamani@arellano.pe"
+  },
+  {
+    "codigo": 1425,
+    "codigo_cdar": 438983,
+    "nombre": "MAMANI ENRIQUEZ TANIA",
+    "email": "tmamani@arellano.pe"
+  },
+  {
+    "codigo": 1222,
+    "codigo_cdar": 439010,
+    "nombre": "ROMAN PEÑA LUIS ENRIQUE",
+    "email": "lroman@arellano.pe"
+  },
+  {
+    "codigo": 8889,
+    "codigo_cdar": 795081,
+    "nombre": "EDSON IVAN TERRONES RODRIGUEZ",
+    "email": "eterrones@arellano.pe"
+  },
+  {
+    "codigo": 8890,
+    "codigo_cdar": 795101,
+    "nombre": "LUIS ARNALDO BAZAN LLATAS",
+    "email": "lbazan@arellano.pe"
+  },
+  {
+    "codigo": 6303,
+    "codigo_cdar": 439402,
+    "nombre": "VALVERDE REYES MARIA DEL PILAR",
+    "email": "mvalverde@arellano.pe"
+  },
+  {
+    "codigo": 10103,
+    "codigo_cdar": 737781,
+    "nombre": "JOSE ANGEL VENTOCILLA SOSA",
+    "email": "jventocilla@arellano.pe"
+  },
+  {
+    "codigo": 3007,
+    "codigo_cdar": 439335,
+    "nombre": "ROMERO VEJARANO MIRTHA YSELA",
+    "email": "mromero@arellano.pe"
+  },
+  {
+    "codigo": 3009,
+    "codigo_cdar": 439336,
+    "nombre": "GUTIERREZ PELAEZ VILMA DEL PILAR",
+    "email": "vgutierrezp@arellano.pe"
+  },
+  {
+    "codigo": 10065,
+    "codigo_cdar": 671501,
+    "nombre": "VILLACORTA TERRONES LILY",
+    "email": "lvillacorta@arellano.pe"
+  },
+  {
+    "codigo": 1111,
+    "codigo_cdar": 498022,
+    "nombre": "CARRILLO CABRERA MIGUEL FAUSTO",
+    "email": "mcarrillo@arellano.pe"
+  },
+  {
+    "codigo": 10146,
+    "codigo_cdar": 823481,
+    "nombre": "ROSA GIOVANA FLORES JORDAN",
+    "email": "rflores@arellano.pe"
+  }
+]

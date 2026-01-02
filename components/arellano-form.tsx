@@ -10,6 +10,7 @@ import ConfirmSubmitModal from "@/components/confirm-submit-modal";
 import { useToast } from "@/components/ui/use-toast";
 import { useCart } from "@/contexts/cart-context";
 import { useGeneralForm } from "@/contexts/general-form-context";
+import { useAuditorAutocomplete } from "@/hooks/useAuditorAutocomplete";
 
 import {
   MapPin,
@@ -41,6 +42,11 @@ export default function ArellanoForm({ onSuccess }: ArellanoFormProps) {
   const { items, clear } = useCart();
   const { general, setGeneral, clearGeneral } = useGeneralForm();
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+  const { results: auditorResults, matchedAuditor } =
+  useAuditorAutocomplete(general.email);
+  const [auditorOpen, setAuditorOpen] = useState(false);
+  const auditorRef = useRef<HTMLDivElement | null>(null);
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
@@ -99,6 +105,30 @@ export default function ArellanoForm({ onSuccess }: ArellanoFormProps) {
   }, []);
 
   // -----------------------------------------
+  // AUTO-OPEN AUDITOR DROPDOWN
+  // -----------------------------------------
+  useEffect(() => {
+    if (matchedAuditor) {
+      setAuditorOpen(false);
+    }
+  }, [matchedAuditor]);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (
+        auditorRef.current &&
+        !auditorRef.current.contains(e.target as Node)
+      ) {
+        setAuditorOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // -----------------------------------------
   // HANDLE CHANGE (context + local)
   // -----------------------------------------
   const handleChange = (
@@ -120,6 +150,10 @@ export default function ArellanoForm({ onSuccess }: ArellanoFormProps) {
 
     if (name === "busqueda") {
       setDropdownOpen(value.length >= 2);
+    }
+
+    if (name === "email") {
+      setAuditorOpen(value.trim().length >= 2);
     }
   };
 
@@ -249,17 +283,52 @@ export default function ArellanoForm({ onSuccess }: ArellanoFormProps) {
                     </select>
                   </FormField>
 
+                  <div className="relative" ref={auditorRef}>
+                    <FormField
+                      label="CORREO ARELLANO"
+                      name="email"
+                      required
+                      type="email"
+                      placeholder="correo@arellano.pe"
+                      icon={<Mail className="w-5 h-5" />}
+                      error={errors.email}
+                      value={general.email}
+                      onChange={handleChange}
+                    />
+
+                    {auditorOpen && auditorResults.length > 0 && !matchedAuditor && (
+                      <div className="absolute left-0 top-full mt-1 w-full bg-white border rounded-md shadow-lg z-30">
+                        {auditorResults.map((a) => (
+                          <button
+                            key={a.email}
+                            type="button"
+                            onClick={() => {
+                              setGeneral(prev => ({ ...prev, email: a.email }));
+                              setAuditorOpen(false);
+                            }}
+                            className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100"
+                          >
+                            <div className="font-medium">{a.nombre}</div>
+                            <div className="text-xs text-gray-500">{a.email}</div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
                   <FormField
-                    label="CORREO ARELLANO"
-                    name="email"
-                    required
-                    type="email"
-                    placeholder="correo@arellano.pe"
-                    icon={<Mail className="w-5 h-5" />}
-                    error={errors.email}
-                    value={general.email}
-                    onChange={handleChange}
-                  />
+                    label="AUDITOR"
+                    type="text"
+                    value={matchedAuditor?.nombre || ""}
+                    disabled
+                  >
+                    <input
+                      disabled
+                      className="w-full px-4 py-2 border rounded-md bg-gray-100 text-gray-700"
+                      placeholder="Se completa automáticamente"
+                      value={matchedAuditor?.nombre || ""}
+                    />
+                  </FormField>
 
                   <FormField
                     label="CÓDIGO DE ALTERNATIVA"

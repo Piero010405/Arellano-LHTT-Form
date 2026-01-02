@@ -1,6 +1,6 @@
 // lib/services/products-service.ts
 import type { Product } from "@/lib/domain/product";
-import { findProductsByDescriptionFTS } from "@/lib/repositories/products-repository";
+import { findProductsByDescription } from "@/lib/repositories/products-repository";
 
 export async function searchProductsService(
   search: string,
@@ -12,5 +12,5 @@ export async function searchProductsService(
 
   const safeLimit = Math.min(Math.max(limit, 1), 25);
 
-  return findProductsByDescriptionFTS(trimmed, safeLimit);
+  return findProductsByDescription(trimmed, safeLimit);
 }

@@ -358,5 +358,71 @@
     "codigo_cdar": 823481,
     "nombre": "ROSA GIOVANA FLORES JORDAN",
     "email": "rflores@arellano.pe"
+  },
+  {
+    "codigo": 6017,
+    "codigo_cdar": 439013,
+    "nombre": "Jean Pierre Dominguez Rodriguez",
+    "email": "pdominguez@arellano.pe"
+  },
+  {
+    "codigo": 6091,
+    "codigo_cdar": 454123,
+    "nombre": "DARLIN ELIZABETH Fuentes-Rivera Bringas",
+    "email": "dfuentes-rivera@arellano.pe"
+  },
+  {
+    "codigo": 7013,
+    "codigo_cdar": 439406,
+    "nombre": "Maritza Marita Quispe Huincho",
+    "email": "mquispe@arellano.pe"
+  },
+  {
+    "codigo": 10016,
+    "codigo_cdar": 534067,
+    "nombre": "Cleofe Clavo Clavo",
+    "email": "cclavo@arellano.pe"
+  },
+  {
+    "codigo": 6052,
+    "codigo_cdar": 454124,
+    "nombre": "JOSE GUILLERMO ALFARO AEDO",
+    "email": "jalfaro@arellano.pe"
+  },
+  {
+    "codigo": 4008,
+    "codigo_cdar": 439322,
+    "nombre": "Evelyn Eliy Ayala Escalante",
+    "email": "eayala@arellano.pe"
+  },
+  {
+    "codigo": 6003,
+    "codigo_cdar": 493180,
+    "nombre": "Gonzalo Beltran Bringas",
+    "email": "gbeltran@arellano.pe"
+  },
+  {
+    "codigo": 0,
+    "codigo_cdar": 0,
+    "nombre": "Carmen Beltran",
+    "email": "cbeltran@arellano.pe"
+  },
+  {
+    "codigo": 0,
+    "codigo_cdar": 0,
+    "nombre": "Junior Vargas",
+    "email": "wvargas@arellano.pe"
+  },
+  {
+    "codigo": 0,
+    "codigo_cdar": 0,
+    "nombre": "Renzo Berrios",
+    "email": "rberrios@arellano.pe"
+  },
+  {
+    "codigo": 0,
+    "codigo_cdar": 0,
+    "nombre": "D'Alessandro del Piero Sarmiento",
+    "email": "dsarmiento@arellano.pe"
   }
 ]

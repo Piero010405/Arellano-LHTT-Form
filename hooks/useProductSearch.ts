@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { supabaseBrowser } from "@/lib/db/supabase-browser";
 
 export interface ProductItem {
   productId: number;
@@ -10,34 +11,50 @@ export interface ProductItem {
 export function useProductSearch(query: string) {
   const [results, setResults] = useState<ProductItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const lastQueryRef = useRef<string>("");
 
   useEffect(() => {
-    if (query.trim().length < 2) {
+    const q = query.trim();
+    if (q.length < 2) {
       setResults([]);
       return;
     }
 
+    // 🔒 dedupe (clave)
+    if (q === lastQueryRef.current) return;
+    lastQueryRef.current = q;
+
     const controller = new AbortController();
-    const timeout = setTimeout(async () => {
+
+    const run = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`/api/products?search=${encodeURIComponent(query)}`, {
-          signal: controller.signal,
-        });
 
-        const data = await res.json();
-        setResults(data.items || []);
-      } catch (err) {
-        if (!(err instanceof Error) || err.name !== "AbortError") {
-          console.error(err);
+        const { data, error } = await supabaseBrowser.rpc(
+          "search_products_smart",
+          {
+            search_text: q,
+            lim: 10,
+          }
+        );
+        
+        if (!error) {
+          setResults(
+            (data ?? []).map((r: any) => ({
+              productId: r.product_id,
+              description: r.description,
+            }))
+          );
         }
       } finally {
         setLoading(false);
       }
-    }, 350);
+    };
+
+    const t = setTimeout(run, 200);
 
     return () => {
-      clearTimeout(timeout);
+      clearTimeout(t);
       controller.abort();
     };
   }, [query]);

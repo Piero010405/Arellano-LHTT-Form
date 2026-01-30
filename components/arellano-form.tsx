@@ -224,6 +224,17 @@ export default function ArellanoForm({ onSuccess }: ArellanoFormProps) {
   };
 
   // -----------------------------------------
+  // LIMPIAR ERROR GLOBAL DE ITEMS
+  // -----------------------------------------
+  const clearItemsError = () => {
+    setErrors(prev => {
+      if (!prev.items) return prev;
+      const { items, ...rest } = prev;
+      return rest;
+    });
+  };
+
+  // -----------------------------------------
   // RENDER
   // -----------------------------------------
   return (
@@ -355,6 +366,7 @@ export default function ArellanoForm({ onSuccess }: ArellanoFormProps) {
                 setDropdownOpen={setDropdownOpen}
                 handleChange={handleChange}
                 errors={errors}
+                clearItemsError={clearItemsError}
               />
 
               {/* LISTA DEL CARRITO */}

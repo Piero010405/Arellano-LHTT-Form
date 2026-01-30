@@ -26,6 +26,7 @@ interface ProductAddFormProps {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => void;
   errors: Record<string, string>;
+  clearItemsError: () => void;
 }
 
 export default function ProductAddForm({
@@ -38,6 +39,7 @@ export default function ProductAddForm({
   setDropdownOpen,
   handleChange,
   errors,
+  clearItemsError,
 }: ProductAddFormProps) {
   const { addItem } = useCart();
   const { toast } = useToast();
@@ -87,9 +89,7 @@ export default function ProductAddForm({
     setItemErrors({});
     
     // borra error global de items
-    if (errors.items) {
-      errors.items = "";
-    }
+    clearItemsError();
 
     // limpiar formulario
     setFormData((p: any) => ({

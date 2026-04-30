@@ -169,7 +169,15 @@ export default function ArellanoForm({ onSuccess }: ArellanoFormProps) {
     else if (!general.email.endsWith("@arellano.pe"))
       newErrors.email = "Debe terminar en @arellano.pe";
 
-    if (!general.codigo) newErrors.codigo = "Campo obligatorio";
+    const codigoNum = Number(general.codigo);
+
+    if (!general.codigo) {
+      newErrors.codigo = "Campo obligatorio";
+    } else if (!Number.isInteger(codigoNum)) {
+      newErrors.codigo = "El código debe ser un número entero";
+    } else if (codigoNum < -2147483648 || codigoNum > 2147483647) {
+      newErrors.codigo = "El código está fuera de rango permitido";
+    }
 
     if (items.length === 0)
       newErrors.items = "Debe agregar al menos 1 producto";
@@ -198,11 +206,14 @@ export default function ArellanoForm({ onSuccess }: ArellanoFormProps) {
       const result = await submitAlternativa(payload);
 
       if (!result.success) {
+        let message = result.message || "Ocurrió un error al enviar el producto";
+
         toast({
-          title: "Error",
-          description: "Un producto no pudo enviarse",
+          title: "Error al enviar",
+          description: message,
           variant: "destructive",
         });
+
         return;
       }
     }

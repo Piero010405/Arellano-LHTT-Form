@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("Error POST /api/responses:", error);
     return NextResponse.json(
-      { error: "Error interno al registrar la respuesta" },
+      { error: "Error interno del servidor" },
       { status: 500 }
     );
   }

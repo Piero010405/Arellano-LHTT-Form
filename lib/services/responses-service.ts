@@ -10,6 +10,7 @@ const ALLOWED_CLUSTERS: Cluster[] = [
   "Cluster Norte",
   "Cluster Centro",
   "Cluster Sur",
+  "Cluster Oriente",
 ];
 
 export async function createFormResponseService(

@@ -4,10 +4,11 @@ import { z } from "zod";
 import { createFormResponseService } from "@/lib/services/responses-service";
 import type { Cluster } from "@/lib/domain/response";
 
-const clusterEnum: [Cluster, Cluster, Cluster] = [
+const clusterEnum: [Cluster, Cluster, Cluster, Cluster] = [
   "Cluster Norte",
   "Cluster Centro",
   "Cluster Sur",
+  "Cluster Oriente",
 ];
 
 const formResponseSchema = z.object({

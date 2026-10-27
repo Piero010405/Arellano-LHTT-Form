@@ -1,6 +1,6 @@
 // lib/domain/response.ts
 
-export type Cluster = "Cluster Norte" | "Cluster Centro" | "Cluster Sur";
+export type Cluster = "Cluster Norte" | "Cluster Centro" | "Cluster Sur" | "Cluster Oriente";
 
 export interface FormResponseInput {
   cluster: Cluster;

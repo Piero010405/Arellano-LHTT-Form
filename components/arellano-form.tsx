@@ -302,6 +302,7 @@ export default function ArellanoForm({ onSuccess }: ArellanoFormProps) {
                       <option value="Cluster Norte">Cluster Norte</option>
                       <option value="Cluster Centro">Cluster Centro</option>
                       <option value="Cluster Sur">Cluster Sur</option>
+                      <option value="Cluster Oriente">Cluster Oriente</option>
                     </select>
                   </FormField>
 
